@@ -8,8 +8,8 @@
 // @match           *://*.deviantart.com/*
 // @require         https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js
 // @run-at          document-end
-// @downloadURL     https://raw.githubusercontent.com/Liamb135/OCLB-helper/master/OCLB-Helper-2.user.js
-// @updateURL       https://raw.githubusercontent.com/Liamb135/OCLB-helper/master/OCLB-Helper-2.user.js
+// @downloadURL     https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
+// @updateURL       https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // ==/UserScript==
 
 if (window.top !== window.self) return;
