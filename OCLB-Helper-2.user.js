@@ -3,7 +3,7 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.0
+// @version         1.1
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @require         https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js
@@ -41,9 +41,9 @@ const make = (t, i, s = "") => {
 };
 
 const divLine = (k, v, c, s) => `
-    <div style="display:flex;justify-content:space-between;align-items:center;font-size:${s};line-height:1.4;margin-bottom:4px;gap:16px;">
-        <span>${k}</span>
-        <span${c ? ` style='color:${c};'` : ""}>${v}</span>
+    <div style="display:flex;align-items:center;font-size:${s};line-height:1.4;margin-bottom:4px;width:100%;">
+        <span style="flex:0 0 auto;">${k}</span>
+        <span style="flex:1;text-align:right;${c ? `color:${c};` : ""}">${v}</span>
     </div>`;
 
 /* ==========================================================================
@@ -165,6 +165,7 @@ window.addEventListener("message", e => {
     if (typeof e.data === "string" && e.data.includes("oclb")) check();
 });
 
+// Live position monitoring for SPA navigation
 let lastPathname = window.location.pathname;
 setInterval(() => {
     if (window.location.pathname !== lastPathname) {
