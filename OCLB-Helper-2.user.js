@@ -3,11 +3,12 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.1
+// @version         1.2
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
-// @require         https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js
+// @require         https://code.jquery.com/jquery-3.7.1.min.js
 // @run-at          document-end
+// @grant           GM_addStyle
 // @downloadURL     https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // @updateURL       https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // ==/UserScript==
@@ -15,7 +16,167 @@
 if (window.top !== window.self) return;
 
 /* ==========================================================================
-   Section 1: Constants
+   Section 1: GM_addStyle CSS
+   ========================================================================== */
+
+GM_addStyle(`
+    #hb-oclb-icon {
+        --panel-bg: var(--g-bg-tertiary, #f5f5f5);
+        --panel-text: var(--g-typography-primary, #222);
+        --panel-border: var(--g-stroke-default, #bbb);
+        --accent: var(--g-brand, #00886c);
+        --error: var(--g-error-primary, #ff5555);
+
+        position: fixed !important;
+        bottom: 16px !important;
+        right: 16px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        justify-content: flex-end !important;
+        gap: 6px !important;
+        background: var(--panel-bg) !important;
+        border: 1px solid var(--panel-border) !important;
+        border-radius: 12px !important;
+        padding: 8px 10px !important;
+        z-index: 99999 !important;
+        cursor: pointer !important;
+        transition: all .2s ease !important;
+        font-family: var(--devious-sans-font-fallback, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif) !important;
+        font-size: var(--g-font-size-s, 14px) !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        max-width: 260px !important;
+        min-height: 48px !important;
+        color: var(--panel-text) !important;
+    }
+
+    #hb-oclb-icon.hb-messages-page { bottom: 190px !important; }
+
+    body.theme-dark #hb-oclb-icon {
+        --panel-bg: var(--g-bg-tertiary, #1e1e1e);
+        --panel-text: var(--g-typography-primary, #e0e0e0);
+        --panel-border: var(--g-stroke-default, #555);
+    }
+
+    #hb-oclb-icon.hb-hovering {
+        justify-content: space-between !important;
+        align-items: flex-end !important;
+        padding: 12px !important;
+        max-width: 300px !important;
+    }
+
+    #hb-oclb-icon.hb-hovering #hb-oclb-label {
+        display: flex !important;
+    }
+
+    #hb-oclb-icon.hb-hovering #hb-oclb-bottom {
+        margin-top: 8px !important;
+    }
+
+    #hb-oclb-icon.hb-hovering #hb-oclb-image {
+        width: 36px !important;
+        height: 43px !important;
+    }
+
+    #hb-oclb-label {
+        display: none !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        line-height: 1.4 !important;
+        text-align: left !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        color: inherit !important;
+    }
+
+    #hb-oclb-bottom {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        width: 100% !important;
+        gap: 8px !important;
+        box-sizing: border-box !important;
+        margin-top: 0 !important;
+    }
+
+    #hb-oclb-count {
+        font-weight: 600 !important;
+        color: var(--accent) !important;
+        font-size: inherit !important;
+    }
+    #hb-oclb-image {
+        width: 30px !important;
+        height: 36px !important;
+        image-rendering: pixelated !important;
+        transition: width .15s ease, height .15s ease !important;
+    }
+
+    .hb-oclb-title {
+        font-weight: 700 !important;
+        text-align: center !important;
+        color: var(--accent) !important;
+        margin-bottom: 6px !important;
+        width: 100% !important;
+    }
+
+    .hb-oclb-divider {
+        width: 100% !important;
+        border: none !important;
+        border-top: 1px solid var(--g-stroke-subtle, #ddd) !important;
+        margin: 4px 0 8px 0 !important;
+    }
+    body.theme-dark .hb-oclb-divider { border-top-color: var(--g-stroke-subtle, #333) !important; }
+    .hb-oclb-divider:last-of-type { margin: 3px 0 0 0 !important; }
+
+    .hb-oclb-line {
+        display: flex !important;
+        align-items: center !important;
+        line-height: 1.4 !important;
+        margin-bottom: 4px !important;
+        width: 100% !important;
+        color: inherit !important;
+        font-size: inherit !important;
+    }
+    .hb-oclb-line span:first-child { flex: 0 0 auto !important; }
+    .hb-oclb-line span:last-child { flex: 1 !important; text-align: right !important; }
+
+    .hb-oclb-accent { color: var(--accent) !important; }
+    .hb-oclb-giving { color: var(--g-typography-secondary, #666) !important; }
+    .hb-oclb-error { color: var(--error) !important; }
+    .hb-oclb-warn {
+        color: var(--error) !important;
+        animation: hb-pulse 1.2s infinite !important;
+    }
+
+    @keyframes hb-pulse {
+        0%, 100% { opacity: 0.4 !important; }
+        50% { opacity: 1 !important; }
+    }
+
+    #hb-oclb-icon.hb-oclb-active,
+    #hb-oclb-icon.hb-oclb-active:hover,
+    #hb-oclb-icon.hb-oclb-active.hb-messages-page {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 2px var(--accent) !important;
+    }
+
+    #hb-oclb-icon.hb-oclb-stopped,
+    #hb-oclb-icon.hb-oclb-stopped:hover,
+    #hb-oclb-icon.hb-oclb-stopped.hb-messages-page {
+        border-color: var(--error) !important;
+        box-shadow: 0 0 0 2px var(--error) !important;
+    }
+
+    body:has([href*="/messages"]) #hb-oclb-icon.hb-messages-page {
+        bottom: 190px !important;
+    }
+`);
+
+/* ==========================================================================
+   Section 2: Constants
    Global variables and functions for GUI
    ========================================================================== */
 
@@ -26,168 +187,147 @@ let active = 0,
     count,
     bottomBar,
     icon,
-    cache,
-    themeVars;
+    observer;
 
 const $ = window.jQuery;
 
-const set = (e, s) => Object.assign(e.style, s);
-
-const make = (t, i, s = "") => {
+const make = (t, i) => {
     const e = document.createElement(t);
     if (i) e.id = i;
-    if (s) e.style.cssText = s;
     return e;
 };
 
-const divLine = (k, v, c, s) => `
-    <div style="display:flex;align-items:center;font-size:${s};line-height:1.4;margin-bottom:4px;width:100%;">
-        <span style="flex:0 0 auto;">${k}</span>
-        <span style="flex:1;text-align:right;${c ? `color:${c};` : ""}">${v}</span>
+const divLine = (k, v, c = "") => `
+    <div class="hb-oclb-line ${c}">
+        <span>${k}</span>
+        <span>${v}</span>
     </div>`;
 
 /* ==========================================================================
-   Section 2: Theme Detection
-   Dark/light mode support
-   ========================================================================== */
-
-function theme() {
-    const b = document.body;
-    if (!b || !b.classList) return null;
-
-    const r = document.querySelector(".surface.surface-primary") || b,
-          t = document.querySelector(".surface-tertiary") || r,
-          dark = b.classList.contains("theme-dark"),
-          lg = b.classList.contains("light-green"),
-          g = getComputedStyle(r),
-          gt = getComputedStyle(t),
-          accentBase = g["--g-accent"] || (dark ? "#00d4aa" : "#00886c"),
-          accent = lg ? g["--g-card-bg-selected"] || accentBase : accentBase;
-
-    return themeVars = {
-        strokeSubtle: gt["--g-stroke-subtle"] || (dark ? "#333" : "#ddd"),
-        strokeDefault: gt["--g-stroke-default"] || (dark ? "#555" : "#bbb"),
-        text: g["--g-text"] || (dark ? "#e0e0e0" : "#222"),
-        card: gt["--g-card-bg"] || (dark ? "#1e1e1e" : "#f5f5f5"),
-        accent,
-        font: g.fontFamily || "-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif",
-        size: g.fontSize || "14px"
-    };
-}
-
-/* ==========================================================================
-   Section 3: Panel Creation
-   Creates the GUI
+   Section 3: Messages Page Position
+   Adjusts GUI position for /messages pages
    ========================================================================== */
 
 function updatePanelPosition() {
     if (!panel) return;
 
     const isMessagesPage = window.location.pathname.includes("/messages");
-    const bottomOffset = isMessagesPage ? "190px" : "16px";
+    const shouldHaveClass = isMessagesPage ? 'add' : 'remove';
 
-    if (panel.style.bottom !== bottomOffset) {
-        panel.style.bottom = bottomOffset;
-    }
+    clearTimeout(window.hbPositionTimeout);
+    window.hbPositionTimeout = setTimeout(() => {
+        if (isMessagesPage) {
+            panel.classList.add("hb-messages-page");
+        } else {
+            panel.classList.remove("hb-messages-page");
+        }
+    }, 50);
 }
+
+/* ==========================================================================
+   Section 4: Panel Creation
+   Creates the GUI
+   ========================================================================== */
 
 function create() {
     if (document.getElementById("hb-oclb-icon")) return;
-    const v = themeVars || theme();
-    if (!v) return;
 
     updatePanelPosition();
 
-    panel = make(
-        "div",
-        "hb-oclb-icon",
-        `position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:6px;background:${v.card};border:1px solid ${v.strokeDefault};border-radius:12px;padding:8px 10px;z-index:99999;cursor:pointer;transition:all .2s ease;font-family:${v.font};font-size:${v.size};overflow:hidden;box-sizing:border-box;max-width:260px;min-height:48px;`
-    );
-
+    panel = make("div", "hb-oclb-icon");
     panel.onclick = tryBulk;
     panel.onmouseover = grow;
     panel.onmouseleave = shrink;
 
-    label = make(
-        "div",
-        "hb-oclb-label",
-        `display:none;flex-direction:column;align-items:flex-start;width:100%;box-sizing:border-box;font-size:${v.size};line-height:1.4;color:${v.text};text-align:left;white-space:normal;word-break:break-word;`
-    );
+    label = make("div", "hb-oclb-label");
     panel.appendChild(label);
 
-    bottomBar = make(
-        "div",
-        "hb-oclb-bottom",
-        `display:flex;align-items:center;justify-content:flex-end;width:100%;gap:8px;box-sizing:border-box;`
-    );
+    bottomBar = make("div", "hb-oclb-bottom");
     panel.appendChild(bottomBar);
 
-    count = make(
-        "span",
-        "hb-oclb-count",
-        `font-weight:600;font-size:${v.size};color:${v.accent};`
-    );
+    count = make("span", "hb-oclb-count");
     bottomBar.appendChild(count);
 
-    icon = make(
-        "img",
-        "hb-oclb-image",
-        "width:30px;height:36px;image-rendering:pixelated;image-rendering:crisp-edges;transition:width .15s ease, height .15s ease;"
-    );
+    icon = make("img", "hb-oclb-image");
     icon.src = "data:image/gif;base64,R0lGODlhHgAkAPQaAOzJYi4kHEonDV0xDVkrFlUyEl0yEHFFLmNjPHV1Pnx8SpRPC5VgLrFtJ8JaKtGMJdGBKdWUNOOKJOqpJuqwNO+pQu6oQ/jGRAAAAPbhbv///wAAAAAAAAAAAAAAAAAAACH5BAUAABoALAAAAAAeACQAQAX/oCZqQYCd2KhqgmAYYvuKKFZmWVmeantdL1xrRdQUjshja7GAQCqVWVF0ZDAcDivWan08LBbpVFRKJEoKRYkcSK9JulvmFO8JKBQcfriqvYktDQ1MUHxERwAAEhJOi4ENTk5eUGJFJQQEBweYTCVMmH8jJzihMQJQEREtqKoCoziwsTwjLQMDeC+GI3KltAJMOD+6Y0VLTU9RMGOIic2Jj5IPExPDGkxaWVzaXV4PUExTTFtX2ePT3wvEbAgIJexv7u0B6rtxOmx1KzsoUzLK/kRe9VpVIRVBgwLsBcBB554vPHoo8HkVS1YKX7ZwGZiIgpeOWaZ+BMlQzWO/XwuCZl2o5mdeMQGCCFWoRs8UEyeUlBFLksQYzmQ7CzhzBg2Cl2nVmC1qJKFotJxErpHbtq2btwrgilSZypUbmEpRF4wbm+0c1nTqLmXaRKBTgE8EehGJR9dlXXplzrRRY3evXEsK++YLAQA7";
     bottomBar.appendChild(icon);
 
     document.body.appendChild(panel);
-
-    cache = {
-        strokeSubtle: v.strokeSubtle,
-        strokeDefault: v.strokeDefault,
-        accent: v.accent,
-        text: v.text,
-        error: "#ff5555",
-        warn: "#ffaa00"
-    };
 }
 
 /* ==========================================================================
-   Section 4: Event Listeners & Init
-   Periodic checks, and OCLB detection
+   Section 5: Event Listeners & Init
+   Startup + Theme observer
    ========================================================================== */
 
-setInterval(theme, 5000);
-setInterval(() => {
-    if (!panel) create();
-    updatePanelPosition();
-    check();
-}, 2000);
+function setupObserver() {
+    observer = new MutationObserver((mutations) => {
+        let needsRecreate = false;
+
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const body = document.body || document.documentElement;
+                const hasDarkClass = body.classList.contains('theme-dark');
+                const currentPanel = document.getElementById('hb-oclb-icon');
+
+                if (currentPanel) {
+                    const computed = getComputedStyle(currentPanel);
+                    if ((hasDarkClass && computed.backgroundColor === 'rgb(245, 245, 245)') ||
+                        (!hasDarkClass && computed.backgroundColor === 'rgb(30, 30, 30)')) {
+                        needsRecreate = true;
+                    }
+                }
+            }
+        });
+
+        if (needsRecreate) {
+            if (panel) {
+                panel.remove();
+                panel = null;
+            }
+            setTimeout(create, 100);
+        }
+    });
+
+    observer.observe(document.body || document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+}
+
+function init() {
+    const waitForBody = setInterval(() => {
+        if (document.body) {
+            clearInterval(waitForBody);
+            setTimeout(() => {
+                create();
+                check();
+            }, 200);
+            setupObserver();
+        }
+    }, 50);
+}
 
 window.addEventListener("message", e => {
     if (typeof e.data === "string" && e.data.includes("oclb")) check();
 });
 
-// Live position monitoring for SPA navigation
-let lastPathname = window.location.pathname;
-setInterval(() => {
-    if (window.location.pathname !== lastPathname) {
-        lastPathname = window.location.pathname;
-        updatePanelPosition();
-    }
-}, 500);
-
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-        create();
-        setTimeout(check, 1000);
-    });
+    document.addEventListener("DOMContentLoaded", init);
 } else {
-    setTimeout(() => {
-        create();
-        setTimeout(check, 1000);
-    }, 100);
+    init();
 }
 
+setInterval(() => {
+    if (!panel) create();
+    else {
+        updatePanelPosition();
+        check();
+    }
+}, 1500);
+
 /* ==========================================================================
-   Section 5: Bulk Llama Automation
+   Section 6: Bulk Llama Automation
    Automation logic
    ========================================================================== */
 
@@ -197,7 +337,7 @@ function tryBulk() {
     check();
 
     const g = $(".oclb-give"),
-          s = $(".oclb-spam");
+        s = $(".oclb-spam");
 
     if (g.length && !s.length) {
         bulk();
@@ -232,7 +372,7 @@ function bulk() {
 }
 
 /* ==========================================================================
-   Section 6: Status Display
+   Section 7: Status Display
    Updates GUI in real-time (Spam/Error only when > 0)
    ========================================================================== */
 
@@ -240,32 +380,34 @@ function check() {
     if (!panel || !count || !label) return;
 
     const g = $(".oclb-give").length,
-          gv = $(".oclb-giving").length,
-          e = $(".oclb.oclb-error, .oclb-error").length,
-          s = $(".oclb-spam").length;
+        gv = $(".oclb-giving").length,
+        e = $(".oclb.oclb-error, .oclb-error").length,
+        s = $(".oclb-spam").length;
 
     if (count.innerHTML !== String(g)) count.innerHTML = g;
 
-    const v = themeVars || theme(),
-          c = cache;
-
     let html = `
-        <div style="font-size:${v.size};font-weight:700;text-align:center;color:${c.accent};margin-bottom:6px;width:100%;">
-            OCLB Helper
-        </div>
-        <hr style="width:100%;display:block;border:none;border-top:1px solid ${c.strokeSubtle};margin:4px 0 8px 0;">
-        ${divLine("+Llama", g, c.accent, v.size)}
-        ${divLine("Giving…", gv, null, v.size)}`;
+        <div class="hb-oclb-title">OCLB Helper</div>
+        <hr class="hb-oclb-divider">
+        ${divLine("+Llama", g, "hb-oclb-accent")}
+        ${divLine("Giving…", gv, "hb-oclb-giving")}`;
 
-    if (s > 0) html += divLine("Spam", s, c.error, v.size);
-    if (e > 0) html += divLine("Error", e, c.warn, v.size);
+    if (s > 0) html += divLine("Spam", s, "hb-oclb-error");
+    if (e > 0) html += divLine("Error", e, "hb-oclb-warn");
 
-    html += `<hr style="width:100%;display:block;border:none;border-top:1px solid ${c.strokeSubtle};margin:3px 0 0 0;">`;
+    html += `<hr class="hb-oclb-divider">`;
 
     label.innerHTML = html;
 
-    const b = stopAuto ? c.error : active ? c.warn : c.strokeDefault;
-    if (panel.style.borderColor !== b) panel.style.borderColor = b;
+    if (stopAuto) {
+        panel.classList.add("hb-oclb-stopped");
+        panel.classList.remove("hb-oclb-active");
+    } else if (active) {
+        panel.classList.add("hb-oclb-active");
+        panel.classList.remove("hb-oclb-stopped");
+    } else {
+        panel.classList.remove("hb-oclb-active", "hb-oclb-stopped");
+    }
 
     if (!active && !stopAuto && window.location.search.includes("hb_oclbh")) {
         setTimeout(bulk, 1000);
@@ -273,39 +415,24 @@ function check() {
 }
 
 /* ==========================================================================
-   Section 7: Panel Interactions
+   Section 8: Panel Interactions
    Hover effects to expand/shrink the GUI
    ========================================================================== */
 
 function grow() {
-    set(panel, {
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        padding: "12px",
-        maxWidth: "300px"
-    });
-
-    set(icon, {
-        width: "36px",
-        height: "43px"
-    });
-
-    label.style.display = "flex";
-    bottomBar.style.marginTop = "8px";
+    if (!panel) return;
+    panel.style.setProperty('transition', 'none', 'important');
+    panel.classList.add('hb-hovering');
+    setTimeout(() => {
+        panel.style.removeProperty('transition');
+    }, 50);
 }
 
 function shrink() {
-    set(panel, {
-        alignItems: "flex-end",
-        padding: "8px 10px",
-        maxWidth: "260px"
-    });
-
-    set(icon, {
-        width: "30px",
-        height: "36px"
-    });
-
-    label.style.display = "none";
-    bottomBar.style.marginTop = "0";
+    if (!panel) return;
+    panel.style.setProperty('transition', 'none', 'important');
+    panel.classList.remove('hb-hovering');
+    setTimeout(() => {
+        panel.style.removeProperty('transition');
+    }, 50);
 }
