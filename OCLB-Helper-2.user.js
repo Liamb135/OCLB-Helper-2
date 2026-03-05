@@ -3,7 +3,7 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.2
+// @version         1.3
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @require         https://code.jquery.com/jquery-3.7.1.min.js
@@ -122,13 +122,14 @@ GM_addStyle(`
         width: 100% !important;
     }
 
-    .hb-oclb-divider {
+   .hb-oclb-divider {
         width: 100% !important;
         border: none !important;
-        border-top: 1px solid var(--g-stroke-subtle, #ddd) !important;
+        border-top: 1px solid var(--g-typography-secondary, #666) !important;
         margin: 4px 0 8px 0 !important;
     }
-    body.theme-dark .hb-oclb-divider { border-top-color: var(--g-stroke-subtle, #333) !important; }
+    body.theme-dark .hb-oclb-divider { border-top-color: var(--g-typography-secondary, #333) !important;
+    }
     .hb-oclb-divider:last-of-type { margin: 3px 0 0 0 !important; }
 
     .hb-oclb-line {
