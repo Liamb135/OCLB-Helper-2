@@ -3,12 +3,14 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.3
+// @version         1.4
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @require         https://code.jquery.com/jquery-3.7.1.min.js
 // @run-at          document-end
 // @grant           GM_addStyle
+// @grant           GM_getValue
+// @grant           GM_setValue
 // @downloadURL     https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // @updateURL       https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // ==/UserScript==
@@ -107,6 +109,17 @@ GM_addStyle(`
         color: var(--accent) !important;
         font-size: inherit !important;
     }
+
+    #hb-oclb-count.hb-count-spam {
+        color: var(--error) !important;
+        font-weight: 700 !important;
+    }
+
+    #hb-oclb-count.hb-count-normal {
+        color: var(--accent) !important;
+        font-weight: 600 !important;
+    }
+
     #hb-oclb-image {
         width: 30px !important;
         height: 36px !important;
@@ -178,11 +191,11 @@ GM_addStyle(`
 
 /* ==========================================================================
    Section 2: Constants
-   Global variables and functions for GUI
    ========================================================================== */
 
 let active = 0,
     stopAuto = 0,
+    spamWaitUntil = 0,
     panel,
     label,
     count,
@@ -191,6 +204,7 @@ let active = 0,
     observer;
 
 const $ = window.jQuery;
+const STORAGE_KEY = 'hb_oclb_spamWaitUntil';
 
 const make = (t, i) => {
     const e = document.createElement(t);
@@ -204,17 +218,28 @@ const divLine = (k, v, c = "") => `
         <span>${v}</span>
     </div>`;
 
+function saveSpamTimer() {
+    GM_setValue(STORAGE_KEY, spamWaitUntil);
+}
+
+function loadSpamTimer() {
+    const saved = GM_getValue(STORAGE_KEY, 0);
+    if (saved > Date.now()) {
+        spamWaitUntil = saved;
+        stopAuto = 1;
+    } else {
+        GM_deleteValue(STORAGE_KEY);
+    }
+}
+
 /* ==========================================================================
    Section 3: Messages Page Position
-   Adjusts GUI position for /messages pages
    ========================================================================== */
 
 function updatePanelPosition() {
     if (!panel) return;
 
     const isMessagesPage = window.location.pathname.includes("/messages");
-    const shouldHaveClass = isMessagesPage ? 'add' : 'remove';
-
     clearTimeout(window.hbPositionTimeout);
     window.hbPositionTimeout = setTimeout(() => {
         if (isMessagesPage) {
@@ -227,7 +252,6 @@ function updatePanelPosition() {
 
 /* ==========================================================================
    Section 4: Panel Creation
-   Creates the GUI
    ========================================================================== */
 
 function create() {
@@ -258,7 +282,6 @@ function create() {
 
 /* ==========================================================================
    Section 5: Event Listeners & Init
-   Startup + Theme observer
    ========================================================================== */
 
 function setupObserver() {
@@ -300,6 +323,7 @@ function init() {
     const waitForBody = setInterval(() => {
         if (document.body) {
             clearInterval(waitForBody);
+            loadSpamTimer();
             setTimeout(() => {
                 create();
                 check();
@@ -328,38 +352,64 @@ setInterval(() => {
 }, 1500);
 
 /* ==========================================================================
-   Section 6: Bulk Llama Automation
-   Automation logic
+   Section 6: Llama Automation
    ========================================================================== */
 
 function tryBulk() {
-    stopAuto = 0;
-    active = 0;
-    check();
-
-    const g = $(".oclb-give"),
-        s = $(".oclb-spam");
-
-    if (g.length && !s.length) {
-        bulk();
-    } else {
-        setTimeout(() => {
-            check();
-            if (g.length && !s.length) bulk();
-        }, 800);
-    }
-}
-
-function bulk() {
-    if ($(".oclb-spam").length) {
+    if (spamWaitUntil > 0 && Date.now() < spamWaitUntil) {
         stopAuto = 1;
         active = 0;
         check();
         return;
     }
 
-    const g = $(".oclb-give");
+    if (spamWaitUntil > 0) {
+        spamWaitUntil = 0;
+        saveSpamTimer();
+    }
 
+    if ($(".oclb-spam").length > 0) {
+        if (spamWaitUntil === 0) {
+            const minutes = 10 + Math.floor(Math.random() * 11);
+            spamWaitUntil = Date.now() + (minutes * 60 * 1000);
+            saveSpamTimer();
+        }
+        stopAuto = 1;
+        active = 0;
+        check();
+        return;
+    }
+
+    stopAuto = 0;
+    active = 0;
+    saveSpamTimer();
+    check();
+
+    const g = $(".oclb-give");
+    if (g.length) {
+        bulk();
+    } else {
+        setTimeout(() => {
+            check();
+            if ($(".oclb-give").length) bulk();
+        }, 800);
+    }
+}
+
+function bulk() {
+    if (spamWaitUntil > 0 && Date.now() < spamWaitUntil) {
+        stopAuto = 1;
+        active = 0;
+        check();
+        return;
+    }
+
+    if ($(".oclb-spam").length > 0) {
+        tryBulk();
+        return;
+    }
+
+    const g = $(".oclb-give");
     if (g.length === 0) {
         active = 0;
         check();
@@ -374,7 +424,6 @@ function bulk() {
 
 /* ==========================================================================
    Section 7: Status Display
-   Updates GUI in real-time (Spam/Error only when > 0)
    ========================================================================== */
 
 function check() {
@@ -385,7 +434,34 @@ function check() {
         e = $(".oclb.oclb-error, .oclb-error").length,
         s = $(".oclb-spam").length;
 
-    if (count.innerHTML !== String(g)) count.innerHTML = g;
+    let displayCount = g;
+    let isSpamCountdown = false;
+
+    if (spamWaitUntil > 0) {
+        const remainingMs = spamWaitUntil - Date.now();
+        if (remainingMs > 0) {
+            const minutes = Math.floor(remainingMs / 60000);
+            const seconds = Math.floor((remainingMs % 60000) / 1000);
+            displayCount = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            isSpamCountdown = true;
+        } else {
+            spamWaitUntil = 0;
+            stopAuto = 0;
+            saveSpamTimer();
+        }
+    }
+
+    if (isSpamCountdown) {
+        count.classList.add('hb-count-spam');
+        count.classList.remove('hb-count-normal');
+    } else {
+        count.classList.add('hb-count-normal');
+        count.classList.remove('hb-count-spam');
+    }
+
+    if (count.innerHTML !== displayCount) {
+        count.innerHTML = displayCount;
+    }
 
     let html = `
         <div class="hb-oclb-title">OCLB Helper</div>
@@ -393,7 +469,7 @@ function check() {
         ${divLine("+Llama", g, "hb-oclb-accent")}
         ${divLine("Giving…", gv, "hb-oclb-giving")}`;
 
-    if (s > 0) html += divLine("Spam", s, "hb-oclb-error");
+    if (s > 0) html += divLine("Spam", s, "hb-oclb-error hb-oclb-warn");
     if (e > 0) html += divLine("Error", e, "hb-oclb-warn");
 
     html += `<hr class="hb-oclb-divider">`;
@@ -417,7 +493,6 @@ function check() {
 
 /* ==========================================================================
    Section 8: Panel Interactions
-   Hover effects to expand/shrink the GUI
    ========================================================================== */
 
 function grow() {
