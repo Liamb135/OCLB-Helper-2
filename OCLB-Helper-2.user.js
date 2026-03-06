@@ -3,7 +3,7 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.4
+// @version         1.4.1
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @require         https://code.jquery.com/jquery-3.7.1.min.js
@@ -204,7 +204,7 @@ let active = 0,
     observer;
 
 const $ = window.jQuery;
-const STORAGE_KEY = 'hb_oclb_spamWaitUntil';
+let STORAGE_KEY;
 
 const make = (t, i) => {
     const e = document.createElement(t);
@@ -218,11 +218,32 @@ const divLine = (k, v, c = "") => `
         <span>${v}</span>
     </div>`;
 
-function saveSpamTimer() {
-    GM_setValue(STORAGE_KEY, spamWaitUntil);
+function getContainerId() {
+    return new Promise((resolve) => {
+        if (typeof window.userContextId !== 'undefined') {
+            resolve(window.userContextId || 0);
+            return;
+        }
+        const checkContext = () => {
+            if (typeof window.userContextId !== 'undefined') {
+                resolve(window.userContextId || 0);
+            } else {
+                setTimeout(checkContext, 100);
+            }
+        };
+        checkContext();
+    });
 }
 
-function loadSpamTimer() {
+async function saveSpamTimer() {
+    const containerId = await getContainerId();
+    const key = `hb_oclb_spamWaitUntil_${containerId}`;
+    GM_setValue(key, spamWaitUntil);
+}
+
+async function loadSpamTimer() {
+    const containerId = await getContainerId();
+    STORAGE_KEY = `hb_oclb_spamWaitUntil_${containerId}`;
     const saved = GM_getValue(STORAGE_KEY, 0);
     if (saved > Date.now()) {
         spamWaitUntil = saved;
@@ -320,10 +341,10 @@ function setupObserver() {
 }
 
 function init() {
-    const waitForBody = setInterval(() => {
+    const waitForBody = setInterval(async () => {
         if (document.body) {
             clearInterval(waitForBody);
-            loadSpamTimer();
+            await loadSpamTimer();
             setTimeout(() => {
                 create();
                 check();
