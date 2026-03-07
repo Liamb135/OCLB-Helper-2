@@ -3,7 +3,7 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.4.1
+// @version         1.4.2
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @require         https://code.jquery.com/jquery-3.7.1.min.js
@@ -11,6 +11,8 @@
 // @grant           GM_addStyle
 // @grant           GM_getValue
 // @grant           GM_setValue
+// @grant           GM_deleteValue
+// @grant           GM_listValues
 // @downloadURL     https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // @updateURL       https://raw.githubusercontent.com/Liamb135/OCLB-Helper-2/master/OCLB-Helper-2.user.js
 // ==/UserScript==
@@ -190,7 +192,7 @@ GM_addStyle(`
 `);
 
 /* ==========================================================================
-   Section 2: Constants
+   Section 2: Constants & Container-Aware Storage
    ========================================================================== */
 
 let active = 0,
@@ -218,32 +220,24 @@ const divLine = (k, v, c = "") => `
         <span>${v}</span>
     </div>`;
 
-function getContainerId() {
-    return new Promise((resolve) => {
-        if (typeof window.userContextId !== 'undefined') {
-            resolve(window.userContextId || 0);
-            return;
-        }
-        const checkContext = () => {
-            if (typeof window.userContextId !== 'undefined') {
-                resolve(window.userContextId || 0);
-            } else {
-                setTimeout(checkContext, 100);
-            }
-        };
-        checkContext();
-    });
+function getContainerKey() {
+    let containerKey = localStorage.getItem("hb_oclb_containerKey");
+    if (!containerKey) {
+        containerKey = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        localStorage.setItem("hb_oclb_containerKey", containerKey);
+    }
+    return containerKey;
 }
 
-async function saveSpamTimer() {
-    const containerId = await getContainerId();
-    const key = `hb_oclb_spamWaitUntil_${containerId}`;
+function saveSpamTimer() {
+    const containerKey = getContainerKey();
+    const key = `hb_oclb_spamWaitUntil_${containerKey}`;
     GM_setValue(key, spamWaitUntil);
 }
 
-async function loadSpamTimer() {
-    const containerId = await getContainerId();
-    STORAGE_KEY = `hb_oclb_spamWaitUntil_${containerId}`;
+function loadSpamTimer() {
+    const containerKey = getContainerKey();
+    STORAGE_KEY = `hb_oclb_spamWaitUntil_${containerKey}`;
     const saved = GM_getValue(STORAGE_KEY, 0);
     if (saved > Date.now()) {
         spamWaitUntil = saved;
@@ -344,7 +338,7 @@ function init() {
     const waitForBody = setInterval(async () => {
         if (document.body) {
             clearInterval(waitForBody);
-            await loadSpamTimer();
+            loadSpamTimer();
             setTimeout(() => {
                 create();
                 check();
