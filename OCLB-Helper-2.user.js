@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name            OCLB Helper 2
-// @namespace       http://hampshirebrony.neocities.org
-// @description     Augments Kishan Bagaria's One Click Llama Button | Modernized Fork
+// @namespace       http://hampshirebrony.neocities.org/
+// @description     Augments Kishan Bagaria's One Click Llama Button & Liamb135's One Click Cake Button
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.4.2
+// @version         1.5.0
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @require         https://code.jquery.com/jquery-3.7.1.min.js
@@ -63,24 +63,28 @@ GM_addStyle(`
         --panel-border: var(--g-stroke-default, #555);
     }
 
-    #hb-oclb-icon.hb-hovering {
+    #hb-oclb-icon.hb-hovering,
+    #hb-oclb-icon.hb-warning {
         justify-content: space-between !important;
         align-items: flex-end !important;
         padding: 12px !important;
         max-width: 300px !important;
     }
 
-    #hb-oclb-icon.hb-hovering #hb-oclb-label {
+    #hb-oclb-icon.hb-hovering #hb-oclb-label,
+    #hb-oclb-icon.hb-warning #hb-oclb-label {
         display: flex !important;
     }
 
-    #hb-oclb-icon.hb-hovering #hb-oclb-bottom {
+    #hb-oclb-icon.hb-hovering #hb-oclb-bottom,
+    #hb-oclb-icon.hb-warning #hb-oclb-bottom {
         margin-top: 8px !important;
     }
 
-    #hb-oclb-icon.hb-hovering #hb-oclb-image {
-        width: 36px !important;
-        height: 43px !important;
+    #hb-oclb-icon.hb-hovering #hb-oclb-image,
+    #hb-oclb-icon.hb-warning #hb-oclb-image {
+        width: 40px !important;
+        height: 36px !important;
     }
 
     #hb-oclb-label {
@@ -122,29 +126,75 @@ GM_addStyle(`
         font-weight: 600 !important;
     }
 
+    #hb-oclb-count.hb-count-zero {
+        color: var(--error) !important;
+        font-weight: 600 !important;
+    }
+
+    #hb-oclb-image, .hb-oclb-mode-icon {
+        image-rendering: pixelated !important;
+        image-rendering: -moz-crisp-edges !important;
+        image-rendering: crisp-edges !important;
+        image-rendering: -webkit-optimize-contrast !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        cursor: pointer !important;
+        opacity: 0.8 !important;
+        transition: all 0.2s ease !important;
+        flex-shrink: 0 !important;
+        display: block !important;
+        width: auto !important;
+        height: 100% !important;
+        max-width: 100% !important;
+    }
+
     #hb-oclb-image {
         width: 30px !important;
         height: 36px !important;
-        image-rendering: pixelated !important;
-        transition: width .15s ease, height .15s ease !important;
     }
 
-    .hb-oclb-title {
+    #hb-oclb-icon.hb-hovering #hb-oclb-image,
+    #hb-oclb-icon.hb-warning #hb-oclb-image {
+        width: 40px !important;
+        height: 36px !important;
+    }
+
+    .hb-oclb-mode-icon {
+        width: 20px !important;
+        height: 18px !important;
+        max-height: 18px !important;
+    }
+
+    #hb-oclb-image:hover, .hb-oclb-mode-icon:hover {
+        opacity: 1 !important;
+        transform: scale(1.1) !important;
+    }
+
+    #hb-oclb-title-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
         font-weight: 700 !important;
-        text-align: center !important;
         color: var(--accent) !important;
         margin-bottom: 6px !important;
-        width: 100% !important;
+        font-size: inherit !important;
+        line-height: 1.4 !important;
+        gap: 8px !important;
     }
 
-   .hb-oclb-divider {
+    .hb-oclb-title-text {
+        flex: 1 !important;
+        text-align: center !important;
+    }
+
+    .hb-oclb-divider {
         width: 100% !important;
         border: none !important;
         border-top: 1px solid var(--g-typography-secondary, #666) !important;
         margin: 4px 0 8px 0 !important;
     }
-    body.theme-dark .hb-oclb-divider { border-top-color: var(--g-typography-secondary, #333) !important;
-    }
+    body.theme-dark .hb-oclb-divider { border-top-color: var(--g-typography-secondary, #333) !important; }
     .hb-oclb-divider:last-of-type { margin: 3px 0 0 0 !important; }
 
     .hb-oclb-line {
@@ -189,6 +239,42 @@ GM_addStyle(`
     body:has([href*="/messages"]) #hb-oclb-icon.hb-messages-page {
         bottom: 190px !important;
     }
+
+    .hb-missing-script-notice {
+        background: var(--error) !important;
+        color: white !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        margin: 8px 0 !important;
+        text-align: center !important;
+        font-weight: 600 !important;
+        box-shadow: 0 2px 8px rgba(255,85,85,0.3) !important;
+    }
+
+    .hb-warning-message {
+        font-size: 12px !important;
+        color: var(--error) !important;
+        text-align: center !important;
+        padding: 6px 0 !important;
+        font-weight: 500 !important;
+        line-height: 1.3 !important;
+    }
+
+    .hb-warning-message a {
+        color: #fff !important;
+        text-decoration: underline !important;
+        font-weight: bold !important;
+        background: rgba(0,0,0,0.2) !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        display: inline-block !important;
+        margin-top: 4px !important;
+    }
+
+    body.theme-dark .hb-warning-message a {
+        color: #ffddaa !important;
+        background: rgba(255,255,255,0.1) !important;
+    }
 `);
 
 /* ==========================================================================
@@ -203,10 +289,20 @@ let active = 0,
     count,
     bottomBar,
     icon,
-    observer;
+    observer,
+    currentInterval = null,
+    isShowingZeroWarning = false;
+
+let cakeMode = GM_getValue("hb_oclb_cakeMode", 0);
 
 const $ = window.jQuery;
 let STORAGE_KEY;
+
+const LLAMA_ICON = "data:image/gif;base64,R0lGODlhHgAkAPQaAOzJYi4kHEonDV0xDVkrFlUyEl0yEHFFLmNjPHV1Pnx8SpRPC5VgLrFtJ8JaKtGMJdGBKdWUNOOKJOqpJuqwNO+pQu6oQ/jGRAAAAPbhbv///wAAAAAAAAAAAAAAAAAAACH5BAUAABoALAAAAAAeACQAQAX/oCZqQYCd2KhqgmAYYvuKKFZmWVmeantdL1xrRdQUjshja7GAQCqVWVF0ZDAcDivWan08LBbpVFRKJEoKRYkcSK9JulvmFO8JKBQcfriqvYktDQ1MUHxERwAAEhJOi4ENTk5eUGJFJQQEBweYTCVMmH8jJzihMQJQEREtqKoCoziwsTwjLQMDeC+GI3KltAJMOD+6Y0VLTU9RMGOIic2Jj5IPExPDGkxaWVzaXV4PUExTTFtX2ePT3wvEbAgIJexv7u0B6rtxOmx1KzsoUzLK/kRe9VpVIRVBgwLsBcBB554vPHoo8HkVS1YKX7ZwGZiIgpeOWaZ+BMlQzWO/XwuCZl2o5mdeMQGCCFWoRs8UEyeUlBFLksQYzmQ7CzhzBg2Cl2nVmC1qJKFotJxErpHbtq2btwrgilSZypUbmEpRF4wbm+0c1nTqLmXaRKBTgE8EehGJR9dlXXplzrRRY3evXEsK++YLAQA7";
+const CAKE_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAkCAYAAAD7PHgWAAAACXBIWXMAAAsTAAALEwEAmpwYAAACgUlEQVRYheWXu28TQRCHvzvHjh+xIwMKDY8GhCvTofT8B0gRoQA6UITEo0FYDhIVCFcICRBtGpwUlqCgo6NASBRxAZGCJUgoAlLAAttg7NxR7G3ILpfgO4f4bH7V7dzuzPjz7syeYds2G3X08H4boPz2g2K3bdugBzJ7EdSLhnSDJNd4fxGA8eMlX46/PTxmAyTPv+yKfPAJyj0nlT20T5kgierz5heXXclIctHsHmXsl2TwCep7Tpdujx+825FjIxMXD2X/yUE/EJQPkozcgy+enQA6P8WTp8dsgPFdCQAWXl0CIPN6GoDLPhMMPkG9Q+inVWqzUyvJFQo3AbAsYT9XegrAtat5AE6d2evq99HMxy1Pd+AJGnovNgzDtS7qBHVyleUiAKaz/OydIwDM5ZcASKfU+ip1PVeScRW7JNt/BP8muZcKt8Wpf/PuvvI+HAoDv0nGEjEAhqPCjhZvJHrANc50blb48ZRdD+SZ4IXJrA0wcSUJwE9LlNLKYk2ZN5oU9XAoHOoqwcAT/OM+2KlMU5y6laWvAEydvKW8/1JtAJBOhdWFoYQytFqflXGtXgegOPdYxPGb4E7JN8FN1a4AkB5xxk5nWfkk9ujYbsHEDDm3nbWGsrxZryrjwSUYGfb222SjWCfXoQaPoOmgMNZU+4PZ/LYk1Kx9ByBORsTbFq//UJ4JWk7nicTUDjE1cUO8t5pbrretNgCG6R76/6mDrbalGkynY7QWXOe3Wz9c7ZGI+k80HYLrbv2lt3PyTbBRb7vaV1erAIymomqgsBjrddDSOomuwSUobzNSM09yXSezUfPPRaENPEHPN2opebOWkh3G8ulP171iuT++6n4BCC7IlM3hyj0AAAAASUVORK5CYII=";
+
+const OCCB_URL = "https://raw.githubusercontent.com/Liamb135/OCCB/master/OCCB.user.js";
+const OCLB_URL = "https://raw.githubusercontent.com/KishanBagaria/OCLB/master/OCLB.user.js";
 
 const make = (t, i) => {
     const e = document.createElement(t);
@@ -219,6 +315,51 @@ const divLine = (k, v, c = "") => `
         <span>${k}</span>
         <span>${v}</span>
     </div>`;
+
+function getGiveSelector() {
+    return cakeMode ? ".occb-give" : ".oclb-give";
+}
+
+function getGivingSelector() {
+    return cakeMode ? ".occb-giving" : ".oclb-giving";
+}
+
+function getSpamSelector() {
+    return cakeMode ? ".occb-spam" : ".oclb-spam";
+}
+
+function getErrorSelector() {
+    return cakeMode ?
+        ".occb.occb-error, .occb-error" :
+        ".oclb.oclb-error, .oclb-error";
+}
+
+function clearAllCounters() {
+    const allSelectors = [
+        '.occb-give', '.oclb-give',
+        '.occb-giving', '.oclb-giving',
+        '.occb-spam', '.oclb-spam',
+        '.occb.occb-error, .occb-error',
+        '.oclb.oclb-error, .oclb-error'
+    ];
+
+    allSelectors.forEach(selector => {
+        $(selector).remove();
+    });
+}
+
+function checkRequiredScript() {
+    const giveSelector = getGiveSelector();
+    if ($(giveSelector).length === 0) {
+        clearAllCounters();
+        return false;
+    }
+    return true;
+}
+
+/* ==========================================================================
+   Section 2b: Container key
+   ========================================================================== */
 
 function getContainerKey() {
     let containerKey = localStorage.getItem("hb_oclb_containerKey");
@@ -275,7 +416,18 @@ function create() {
     updatePanelPosition();
 
     panel = make("div", "hb-oclb-icon");
-    panel.onclick = tryBulk;
+
+    panel.onclick = (ev) => {
+        ev.stopPropagation();
+
+        if ($(getGiveSelector()).length === 0 && !isShowingZeroWarning) {
+            showZeroBadgeWarning();
+            return;
+        }
+
+        tryBulk();
+    };
+
     panel.onmouseover = grow;
     panel.onmouseleave = shrink;
 
@@ -289,11 +441,52 @@ function create() {
     bottomBar.appendChild(count);
 
     icon = make("img", "hb-oclb-image");
-    icon.src = "data:image/gif;base64,R0lGODlhHgAkAPQaAOzJYi4kHEonDV0xDVkrFlUyEl0yEHFFLmNjPHV1Pnx8SpRPC5VgLrFtJ8JaKtGMJdGBKdWUNOOKJOqpJuqwNO+pQu6oQ/jGRAAAAPbhbv///wAAAAAAAAAAAAAAAAAAACH5BAUAABoALAAAAAAeACQAQAX/oCZqQYCd2KhqgmAYYvuKKFZmWVmeantdL1xrRdQUjshja7GAQCqVWVF0ZDAcDivWan08LBbpVFRKJEoKRYkcSK9JulvmFO8JKBQcfriqvYktDQ1MUHxERwAAEhJOi4ENTk5eUGJFJQQEBweYTCVMmH8jJzihMQJQEREtqKoCoziwsTwjLQMDeC+GI3KltAJMOD+6Y0VLTU9RMGOIic2Jj5IPExPDGkxaWVzaXV4PUExTTFtX2ePT3wvEbAgIJexv7u0B6rtxOmx1KzsoUzLK/kRe9VpVIRVBgwLsBcBB554vPHoo8HkVS1YKX7ZwGZiIgpeOWaZ+BMlQzWO/XwuCZl2o5mdeMQGCCFWoRs8UEyeUlBFLksQYzmQ7CzhzBg2Cl2nVmC1qJKFotJxErpHbtq2btwrgilSZypUbmEpRF4wbm+0c1nTqLmXaRKBTgE8EehGJR9dlXXplzrRRY3evXEsK++YLAQA7";
+    updateIconForMode();
     bottomBar.appendChild(icon);
 
     document.body.appendChild(panel);
 }
+
+function showZeroBadgeWarning() {
+    if (!label || !panel) return;
+
+    isShowingZeroWarning = true;
+    panel.classList.add('hb-warning');
+
+    const titleText = cakeMode ? "OCCB Helper" : "OCLB Helper";
+    const installText = cakeMode ? "OCCB" : "OCLB";
+    const installUrl = cakeMode ? OCCB_URL : OCLB_URL;
+
+    const html = `
+        <div id="hb-oclb-title-container">
+            <span class="hb-oclb-title-text">${titleText}</span>
+        </div>
+        <hr class="hb-oclb-divider">
+        <div class="hb-oclb-line hb-oclb-error hb-oclb-warn">
+            <span>No badges available</span>
+            <span>0</span>
+        </div>
+        <hr class="hb-oclb-divider">
+        <div class="hb-warning-message">
+            Have you Installed <a href="${installUrl}" target="_blank">${installText}</a>?
+        </div>`;
+
+    label.innerHTML = html;
+}
+
+function hideZeroWarning() {
+    isShowingZeroWarning = false;
+    if (panel) {
+        panel.classList.remove('hb-warning');
+    }
+    check();
+}
+
+function updateIconForMode() {
+    if (!icon) return;
+    icon.src = cakeMode ? CAKE_ICON : LLAMA_ICON;
+}
+
 
 /* ==========================================================================
    Section 5: Event Listeners & Init
@@ -362,15 +555,34 @@ setInterval(() => {
     if (!panel) create();
     else {
         updatePanelPosition();
-        check();
+        if (!isShowingZeroWarning) {
+            check();
+        }
     }
 }, 1500);
 
 /* ==========================================================================
-   Section 6: Llama Automation
+   Section 6: Llama/Cake Automation
    ========================================================================== */
 
+function stopCurrentMode() {
+    active = 0;
+    stopAuto = 1;
+    isShowingZeroWarning = false;
+
+    if (currentInterval) {
+        clearTimeout(currentInterval);
+        currentInterval = null;
+    }
+
+    check();
+}
+
 function tryBulk() {
+    if (!checkRequiredScript()) {
+        return;
+    }
+
     if (spamWaitUntil > 0 && Date.now() < spamWaitUntil) {
         stopAuto = 1;
         active = 0;
@@ -383,7 +595,7 @@ function tryBulk() {
         saveSpamTimer();
     }
 
-    if ($(".oclb-spam").length > 0) {
+    if ($(getSpamSelector()).length > 0) {
         if (spamWaitUntil === 0) {
             const minutes = 10 + Math.floor(Math.random() * 11);
             spamWaitUntil = Date.now() + (minutes * 60 * 1000);
@@ -396,22 +608,28 @@ function tryBulk() {
     }
 
     stopAuto = 0;
-    active = 0;
+    active = 1;
     saveSpamTimer();
     check();
 
-    const g = $(".oclb-give");
+    const g = $(getGiveSelector());
     if (g.length) {
         bulk();
     } else {
         setTimeout(() => {
             check();
-            if ($(".oclb-give").length) bulk();
+            if ($(getGiveSelector()).length) bulk();
         }, 800);
     }
 }
 
 function bulk() {
+    if (!checkRequiredScript()) {
+        active = 0;
+        check();
+        return;
+    }
+
     if (spamWaitUntil > 0 && Date.now() < spamWaitUntil) {
         stopAuto = 1;
         active = 0;
@@ -419,12 +637,12 @@ function bulk() {
         return;
     }
 
-    if ($(".oclb-spam").length > 0) {
+    if ($(getSpamSelector()).length > 0) {
         tryBulk();
         return;
     }
 
-    const g = $(".oclb-give");
+    const g = $(getGiveSelector());
     if (g.length === 0) {
         active = 0;
         check();
@@ -434,7 +652,7 @@ function bulk() {
     active = 1;
     g.first().click();
     check();
-    setTimeout(bulk, 500);
+    currentInterval = setTimeout(bulk, 500);
 }
 
 /* ==========================================================================
@@ -442,12 +660,12 @@ function bulk() {
    ========================================================================== */
 
 function check() {
-    if (!panel || !count || !label) return;
+    if (!panel || !count || !label || isShowingZeroWarning) return;
 
-    const g = $(".oclb-give").length,
-        gv = $(".oclb-giving").length,
-        e = $(".oclb.oclb-error, .oclb-error").length,
-        s = $(".oclb-spam").length;
+    const g = $(getGiveSelector()).length;
+    const gv = $(getGivingSelector()).length;
+    const e = $(getErrorSelector()).length;
+    const s = $(getSpamSelector()).length;
 
     let displayCount = g;
     let isSpamCountdown = false;
@@ -468,28 +686,71 @@ function check() {
 
     if (isSpamCountdown) {
         count.classList.add('hb-count-spam');
-        count.classList.remove('hb-count-normal');
+        count.classList.remove('hb-count-normal', 'hb-count-zero');
+    } else if (g === 0) {
+        count.classList.add('hb-count-zero');
+        count.classList.remove('hb-count-normal', 'hb-count-spam');
+        displayCount = "0";
     } else {
         count.classList.add('hb-count-normal');
-        count.classList.remove('hb-count-spam');
+        count.classList.remove('hb-count-spam', 'hb-count-zero');
     }
 
     if (count.innerHTML !== displayCount) {
         count.innerHTML = displayCount;
     }
 
+    const titleText = cakeMode ? "OCCB Helper" : "OCLB Helper";
+    const lineLabel = cakeMode ? "+Cake" : "+Llama";
+
+    const modeIconSrc = cakeMode ? LLAMA_ICON : CAKE_ICON;
+    const modeIconHtml = `<img src="${modeIconSrc}" class="hb-oclb-mode-icon" id="hb-oclb-mode-icon" alt="Switch mode">`;
+
     let html = `
-        <div class="hb-oclb-title">OCLB Helper</div>
+        <div id="hb-oclb-title-container">
+            <span class="hb-oclb-title-text">${titleText}</span>
+            <span>${modeIconHtml}</span>
+        </div>`;
+
+    const hasButtons = g > 0 || gv > 0 || s > 0 || e > 0;
+
+    if (!hasButtons) {
+        html += `
         <hr class="hb-oclb-divider">
-        ${divLine("+Llama", g, "hb-oclb-accent")}
+        ${divLine(lineLabel, "0", "hb-oclb-accent")}`;
+    } else {
+        html += `
+        <hr class="hb-oclb-divider">
+        ${divLine(lineLabel, g, "hb-oclb-accent")}
         ${divLine("Giving…", gv, "hb-oclb-giving")}`;
 
-    if (s > 0) html += divLine("Spam", s, "hb-oclb-error hb-oclb-warn");
-    if (e > 0) html += divLine("Error", e, "hb-oclb-warn");
+        if (s > 0) html += divLine("Spam", s, "hb-oclb-error hb-oclb-warn");
+        if (e > 0) html += divLine("Error", e, "hb-oclb-warn");
 
-    html += `<hr class="hb-oclb-divider">`;
+        html += `<hr class="hb-oclb-divider">`;
+    }
 
     label.innerHTML = html;
+
+    const modeIcon = document.getElementById("hb-oclb-mode-icon");
+    if (modeIcon) {
+        modeIcon.onclick = (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            stopCurrentMode();
+
+            cakeMode = cakeMode ? 0 : 1;
+            GM_setValue("hb_oclb_cakeMode", cakeMode);
+            updateIconForMode();
+
+            setTimeout(() => {
+                active = 0;
+                stopAuto = 0;
+                check();
+            }, 200);
+        };
+    }
 
     if (stopAuto) {
         panel.classList.add("hb-oclb-stopped");
@@ -511,7 +772,7 @@ function check() {
    ========================================================================== */
 
 function grow() {
-    if (!panel) return;
+    if (!panel || isShowingZeroWarning) return;
     panel.style.setProperty('transition', 'none', 'important');
     panel.classList.add('hb-hovering');
     setTimeout(() => {
@@ -520,10 +781,22 @@ function grow() {
 }
 
 function shrink() {
-    if (!panel) return;
+    if (!panel || isShowingZeroWarning) return;
     panel.style.setProperty('transition', 'none', 'important');
     panel.classList.remove('hb-hovering');
     setTimeout(() => {
         panel.style.removeProperty('transition');
     }, 50);
 }
+
+document.addEventListener('click', function(ev) {
+    if (isShowingZeroWarning && !panel.contains(ev.target)) {
+        hideZeroWarning();
+    }
+}, true);
+
+document.addEventListener('keydown', function(ev) {
+    if (isShowingZeroWarning && ev.key === 'Escape') {
+        hideZeroWarning();
+    }
+});
