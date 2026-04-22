@@ -3,10 +3,9 @@
 // @namespace       http://hampshirebrony.neocities.org/
 // @description     Augments Kishan Bagaria's One Click Llama Button & Liamb135's One Click Cake Button
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.5.0
+// @version         1.5.1
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
-// @require         https://code.jquery.com/jquery-3.7.1.min.js
 // @run-at          document-end
 // @grant           GM_addStyle
 // @grant           GM_getValue
@@ -295,7 +294,6 @@ let active = 0,
 
 let cakeMode = GM_getValue("hb_oclb_cakeMode", 0);
 
-const $ = window.jQuery;
 let STORAGE_KEY;
 
 const LLAMA_ICON = "data:image/gif;base64,R0lGODlhHgAkAPQaAOzJYi4kHEonDV0xDVkrFlUyEl0yEHFFLmNjPHV1Pnx8SpRPC5VgLrFtJ8JaKtGMJdGBKdWUNOOKJOqpJuqwNO+pQu6oQ/jGRAAAAPbhbv///wAAAAAAAAAAAAAAAAAAACH5BAUAABoALAAAAAAeACQAQAX/oCZqQYCd2KhqgmAYYvuKKFZmWVmeantdL1xrRdQUjshja7GAQCqVWVF0ZDAcDivWan08LBbpVFRKJEoKRYkcSK9JulvmFO8JKBQcfriqvYktDQ1MUHxERwAAEhJOi4ENTk5eUGJFJQQEBweYTCVMmH8jJzihMQJQEREtqKoCoziwsTwjLQMDeC+GI3KltAJMOD+6Y0VLTU9RMGOIic2Jj5IPExPDGkxaWVzaXV4PUExTTFtX2ePT3wvEbAgIJexv7u0B6rtxOmx1KzsoUzLK/kRe9VpVIRVBgwLsBcBB554vPHoo8HkVS1YKX7ZwGZiIgpeOWaZ+BMlQzWO/XwuCZl2o5mdeMQGCCFWoRs8UEyeUlBFLksQYzmQ7CzhzBg2Cl2nVmC1qJKFotJxErpHbtq2btwrgilSZypUbmEpRF4wbm+0c1nTqLmXaRKBTgE8EehGJR9dlXXplzrRRY3evXEsK++YLAQA7";
@@ -315,6 +313,27 @@ const divLine = (k, v, c = "") => `
         <span>${k}</span>
         <span>${v}</span>
     </div>`;
+
+// Vanilla JS selector helpers
+function select(selector) {
+    return document.querySelector(selector);
+}
+
+function selectAll(selector) {
+    return document.querySelectorAll(selector);
+}
+
+function getElementsLength(selector) {
+    return selectAll(selector).length;
+}
+
+function getFirstElement(selector) {
+    return select(selector);
+}
+
+function removeElements(selector) {
+    selectAll(selector).forEach(el => el.remove());
+}
 
 function getGiveSelector() {
     return cakeMode ? ".occb-give" : ".oclb-give";
@@ -344,13 +363,13 @@ function clearAllCounters() {
     ];
 
     allSelectors.forEach(selector => {
-        $(selector).remove();
+        removeElements(selector);
     });
 }
 
 function checkRequiredScript() {
     const giveSelector = getGiveSelector();
-    if ($(giveSelector).length === 0) {
+    if (getElementsLength(giveSelector) === 0) {
         clearAllCounters();
         return false;
     }
@@ -420,7 +439,7 @@ function create() {
     panel.onclick = (ev) => {
         ev.stopPropagation();
 
-        if ($(getGiveSelector()).length === 0 && !isShowingZeroWarning) {
+        if (getElementsLength(getGiveSelector()) === 0 && !isShowingZeroWarning) {
             showZeroBadgeWarning();
             return;
         }
@@ -486,7 +505,6 @@ function updateIconForMode() {
     if (!icon) return;
     icon.src = cakeMode ? CAKE_ICON : LLAMA_ICON;
 }
-
 
 /* ==========================================================================
    Section 5: Event Listeners & Init
@@ -595,7 +613,7 @@ function tryBulk() {
         saveSpamTimer();
     }
 
-    if ($(getSpamSelector()).length > 0) {
+    if (getElementsLength(getSpamSelector()) > 0) {
         if (spamWaitUntil === 0) {
             const minutes = 10 + Math.floor(Math.random() * 11);
             spamWaitUntil = Date.now() + (minutes * 60 * 1000);
@@ -612,13 +630,13 @@ function tryBulk() {
     saveSpamTimer();
     check();
 
-    const g = $(getGiveSelector());
-    if (g.length) {
+    const g = getFirstElement(getGiveSelector());
+    if (g) {
         bulk();
     } else {
         setTimeout(() => {
             check();
-            if ($(getGiveSelector()).length) bulk();
+            if (getFirstElement(getGiveSelector())) bulk();
         }, 800);
     }
 }
@@ -637,20 +655,20 @@ function bulk() {
         return;
     }
 
-    if ($(getSpamSelector()).length > 0) {
+    if (getElementsLength(getSpamSelector()) > 0) {
         tryBulk();
         return;
     }
 
-    const g = $(getGiveSelector());
-    if (g.length === 0) {
+    const g = getFirstElement(getGiveSelector());
+    if (!g) {
         active = 0;
         check();
         return;
     }
 
     active = 1;
-    g.first().click();
+    g.click();
     check();
     currentInterval = setTimeout(bulk, 500);
 }
@@ -662,10 +680,10 @@ function bulk() {
 function check() {
     if (!panel || !count || !label || isShowingZeroWarning) return;
 
-    const g = $(getGiveSelector()).length;
-    const gv = $(getGivingSelector()).length;
-    const e = $(getErrorSelector()).length;
-    const s = $(getSpamSelector()).length;
+    const g = getElementsLength(getGiveSelector());
+    const gv = getElementsLength(getGivingSelector());
+    const e = getElementsLength(getErrorSelector());
+    const s = getElementsLength(getSpamSelector());
 
     let displayCount = g;
     let isSpamCountdown = false;
