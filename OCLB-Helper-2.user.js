@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name            OCLB Helper 2
-// @namespace       http://hampshirebrony.neocities.org/
+// @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button & Liamb135's One Click Cake Button
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.5.1
+// @version         1.6.0
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @run-at          document-end
@@ -24,12 +24,6 @@ if (window.top !== window.self) return;
 
 GM_addStyle(`
     #hb-oclb-icon {
-        --panel-bg: var(--g-bg-tertiary, #f5f5f5);
-        --panel-text: var(--g-typography-primary, #222);
-        --panel-border: var(--g-stroke-default, #bbb);
-        --accent: var(--g-brand, #00886c);
-        --error: var(--g-error-primary, #ff5555);
-
         position: fixed !important;
         bottom: 16px !important;
         right: 16px !important;
@@ -38,8 +32,8 @@ GM_addStyle(`
         align-items: flex-end !important;
         justify-content: flex-end !important;
         gap: 6px !important;
-        background: var(--panel-bg) !important;
-        border: 1px solid var(--panel-border) !important;
+        background: var(--g-bg-tertiary, #f5f5f5) !important;
+        border: 1px solid var(--g-stroke-default, #bbb) !important;
         border-radius: 12px !important;
         padding: 8px 10px !important;
         z-index: 99999 !important;
@@ -51,15 +45,15 @@ GM_addStyle(`
         box-sizing: border-box !important;
         max-width: 260px !important;
         min-height: 48px !important;
-        color: var(--panel-text) !important;
+        color: var(--g-typography-primary, #222) !important;
     }
 
     #hb-oclb-icon.hb-messages-page { bottom: 190px !important; }
 
     body.theme-dark #hb-oclb-icon {
-        --panel-bg: var(--g-bg-tertiary, #1e1e1e);
-        --panel-text: var(--g-typography-primary, #e0e0e0);
-        --panel-border: var(--g-stroke-default, #555);
+        background: var(--g-bg-tertiary, #1e1e1e) !important;
+        color: var(--g-typography-primary, #e0e0e0) !important;
+        border-color: var(--g-stroke-default, #555) !important;
     }
 
     #hb-oclb-icon.hb-hovering,
@@ -111,22 +105,22 @@ GM_addStyle(`
 
     #hb-oclb-count {
         font-weight: 600 !important;
-        color: var(--accent) !important;
+        color: var(--g-brand, #00886c) !important;
         font-size: inherit !important;
     }
 
     #hb-oclb-count.hb-count-spam {
-        color: var(--error) !important;
+        color: var(--g-error-primary, #ff5555) !important;
         font-weight: 700 !important;
     }
 
     #hb-oclb-count.hb-count-normal {
-        color: var(--accent) !important;
+        color: var(--g-brand, #00886c) !important;
         font-weight: 600 !important;
     }
 
     #hb-oclb-count.hb-count-zero {
-        color: var(--error) !important;
+        color: var(--g-error-primary, #ff5555) !important;
         font-weight: 600 !important;
     }
 
@@ -175,7 +169,7 @@ GM_addStyle(`
         justify-content: space-between !important;
         width: 100% !important;
         font-weight: 700 !important;
-        color: var(--accent) !important;
+        color: var(--g-brand, #00886c) !important;
         margin-bottom: 6px !important;
         font-size: inherit !important;
         line-height: 1.4 !important;
@@ -208,11 +202,11 @@ GM_addStyle(`
     .hb-oclb-line span:first-child { flex: 0 0 auto !important; }
     .hb-oclb-line span:last-child { flex: 1 !important; text-align: right !important; }
 
-    .hb-oclb-accent { color: var(--accent) !important; }
+    .hb-oclb-accent { color: var(--g-brand, #00886c) !important; }
     .hb-oclb-giving { color: var(--g-typography-secondary, #666) !important; }
-    .hb-oclb-error { color: var(--error) !important; }
+    .hb-oclb-error { color: var(--g-error-primary, #ff5555) !important; }
     .hb-oclb-warn {
-        color: var(--error) !important;
+        color: var(--g-error-primary, #ff5555) !important;
         animation: hb-pulse 1.2s infinite !important;
     }
 
@@ -224,23 +218,19 @@ GM_addStyle(`
     #hb-oclb-icon.hb-oclb-active,
     #hb-oclb-icon.hb-oclb-active:hover,
     #hb-oclb-icon.hb-oclb-active.hb-messages-page {
-        border-color: var(--accent) !important;
-        box-shadow: 0 0 0 2px var(--accent) !important;
+        border-color: var(--g-brand, #00886c) !important;
+        box-shadow: 0 0 0 2px var(--g-brand, #00886c) !important;
     }
 
     #hb-oclb-icon.hb-oclb-stopped,
     #hb-oclb-icon.hb-oclb-stopped:hover,
     #hb-oclb-icon.hb-oclb-stopped.hb-messages-page {
-        border-color: var(--error) !important;
-        box-shadow: 0 0 0 2px var(--error) !important;
-    }
-
-    body:has([href*="/messages"]) #hb-oclb-icon.hb-messages-page {
-        bottom: 190px !important;
+        border-color: var(--g-error-primary, #ff5555) !important;
+        box-shadow: 0 0 0 2px var(--g-error-primary, #ff5555) !important;
     }
 
     .hb-missing-script-notice {
-        background: var(--error) !important;
+        background: var(--g-error-primary, #ff5555) !important;
         color: white !important;
         padding: 12px !important;
         border-radius: 8px !important;
@@ -252,7 +242,7 @@ GM_addStyle(`
 
     .hb-warning-message {
         font-size: 12px !important;
-        color: var(--error) !important;
+        color: var(--g-error-primary, #ff5555) !important;
         text-align: center !important;
         padding: 6px 0 !important;
         font-weight: 500 !important;
@@ -290,13 +280,18 @@ let active = 0,
     icon,
     observer,
     currentInterval = null,
-    isShowingZeroWarning = false;
+    isShowingZeroWarning = false,
+    lastSpamRecordTime = 0;
 
 let cakeMode = GM_getValue("hb_oclb_cakeMode", 0);
 
 let STORAGE_KEY;
 
-const LLAMA_ICON = "data:image/gif;base64,R0lGODlhHgAkAPQaAOzJYi4kHEonDV0xDVkrFlUyEl0yEHFFLmNjPHV1Pnx8SpRPC5VgLrFtJ8JaKtGMJdGBKdWUNOOKJOqpJuqwNO+pQu6oQ/jGRAAAAPbhbv///wAAAAAAAAAAAAAAAAAAACH5BAUAABoALAAAAAAeACQAQAX/oCZqQYCd2KhqgmAYYvuKKFZmWVmeantdL1xrRdQUjshja7GAQCqVWVF0ZDAcDivWan08LBbpVFRKJEoKRYkcSK9JulvmFO8JKBQcfriqvYktDQ1MUHxERwAAEhJOi4ENTk5eUGJFJQQEBweYTCVMmH8jJzihMQJQEREtqKoCoziwsTwjLQMDeC+GI3KltAJMOD+6Y0VLTU9RMGOIic2Jj5IPExPDGkxaWVzaXV4PUExTTFtX2ePT3wvEbAgIJexv7u0B6rtxOmx1KzsoUzLK/kRe9VpVIRVBgwLsBcBB554vPHoo8HkVS1YKX7ZwGZiIgpeOWaZ+BMlQzWO/XwuCZl2o5mdeMQGCCFWoRs8UEyeUlBFLksQYzmQ7CzhzBg2Cl2nVmC1qJKFotJxErpHbtq2btwrgilSZypUbmEpRF4wbm+0c1nTqLmXaRKBTgE8EehGJR9dlXXplzrRRY3evXEsK++YLAQA7";
+let sentHistoryTimestamps = [];
+let spamTriggerHistory = [];
+let nextExpiryTimeout = null;
+
+const LLAMA_ICON = "data:image/gif;base64,R0lGODlhHgAkAPQaAOzJYi4kHEonDV0xDVkrFlUyEl0yEHFFLmNjPHV1Pnx8SpRPC5VgLrFtJ8JaKtGMJdGBKdWUNOOKJOqpJuqwNO+pQu6oQ/jGRAAAAPbhbv///wAAAAAAAAAAAAAAAAAAACH5BAUAABoALAAAAAAeACQAQAX/oCZqQYCd2KhqgmAYYvuKKFZmWVmeantdL1xrRdQUjshja7GAQCqVWVF0ZDAcDivWan08LBbpVFRKJEoKRYkcSK9JulvmFO8JKBQcfriqvYktDQ1MUHxERwAAEhJOi4ENTk5eUGJFJQQEBweYTCVMmH8jJzihMQJQEREtqKoCoziwsTwjLQMDeC+GI3KltAJMOD+6Y0VLTU9RMGOIic2Jj5IPExPDGkxaWVzaXV4PUExTTFtX2ePT3wvEbAgIJexv7u0B6rtxOmx1KzsoUzLK/kRe9VpVIRVBgwLsBcBB554vPHoo8HkVS1YKX7ZwGZiIgpeOWaZ+BMlQzWO/XwuCZl2o5mdeMQGCCFWoRs8UEyeUlBFLksQYzmQ7CzhzBg2Cl2nVmC1qJKFotJxErpHbtq6btwrgilSZypUbmEpRF4wbm+0c1nTqLmXaRKBTgE8EehGJR9dlXXplzrRRY3evXEsK++YLAQA7";
 const CAKE_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAkCAYAAAD7PHgWAAAACXBIWXMAAAsTAAALEwEAmpwYAAACgUlEQVRYheWXu28TQRCHvzvHjh+xIwMKDY8GhCvTofT8B0gRoQA6UITEo0FYDhIVCFcICRBtGpwUlqCgo6NASBRxAZGCJUgoAlLAAttg7NxR7G3ILpfgO4f4bH7V7dzuzPjz7syeYds2G3X08H4boPz2g2K3bdugBzJ7EdSLhnSDJNd4fxGA8eMlX46/PTxmAyTPv+yKfPAJyj0nlT20T5kgierz5heXXclIctHsHmXsl2TwCep7Tpdujx+825FjIxMXD2X/yUE/EJQPkozcgy+enQA6P8WTp8dsgPFdCQAWXl0CIPN6GoDLPhMMPkG9Q+inVWqzUyvJFQo3AbAsYT9XegrAtat5AE6d2evq99HMxy1Pd+AJGnovNgzDtS7qBHVyleUiAKaz/OydIwDM5ZcASKfU+ip1PVeScRW7JNt/BP8muZcKt8Wpf/PuvvI+HAoDv0nGEjEAhqPCjhZvJHrANc50blb48ZRdD+SZ4IXJrA0wcSUJwE9LlNLKYk2ZN5oU9XAoHOoqwcAT/OM+2KlMU5y6laWvAEydvKW8/1JtAJBOhdWFoYQytFqflXGtXgegOPdYxPGb4E7JN8FN1a4AkB5xxk5nWfkk9ujYbsHEDDm3nbWGsrxZryrjwSUYGfb222SjWCfXoQaPoOmgMNZU+4PZ/LYk1Kx9ByBORsTbFq//UJ4JWk7nicTUDjE1cUO8t5pbrretNgCG6R76/6mDrbalGkynY7QWXOe3Wz9c7ZGI+k80HYLrbv2lt3PyTbBRb7vaV1erAIymomqgsBjrddDSOomuwSUobzNSM09yXSezUfPPRaENPEHPN2opebOWkh3G8ulP171iuT++6n4BCC7IlM3hyj0AAAAASUVORK5CYII=";
 
 const OCCB_URL = "https://raw.githubusercontent.com/Liamb135/OCCB/master/OCCB.user.js";
@@ -310,11 +305,16 @@ const make = (t, i) => {
 
 const divLine = (k, v, c = "") => `
     <div class="hb-oclb-line ${c}">
-        <span>${k}</span>
-        <span>${v}</span>
+        <span>${escapeHtml(k)}</span>
+        <span>${escapeHtml(String(v))}</span>
     </div>`;
 
-// Vanilla JS selector helpers
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function select(selector) {
     return document.querySelector(selector);
 }
@@ -377,7 +377,7 @@ function checkRequiredScript() {
 }
 
 /* ==========================================================================
-   Section 2b: Container key
+   Section 2b: Container key & Storage
    ========================================================================== */
 
 function getContainerKey() {
@@ -407,6 +407,162 @@ function loadSpamTimer() {
     }
 }
 
+function saveSentHistory() {
+    const containerKey = getContainerKey();
+    const key = `hb_oclb_sentHistory_${containerKey}`;
+    GM_setValue(key, JSON.stringify(sentHistoryTimestamps));
+}
+
+function saveSpamTriggerHistory() {
+    const containerKey = getContainerKey();
+    const key = `hb_oclb_spamTriggers_${containerKey}`;
+    GM_setValue(key, JSON.stringify(spamTriggerHistory));
+}
+
+function loadSpamTriggerHistory() {
+    const containerKey = getContainerKey();
+    const key = `hb_oclb_spamTriggers_${containerKey}`;
+    const saved = GM_getValue(key, null);
+
+    if (saved) {
+        try {
+            spamTriggerHistory = JSON.parse(saved);
+            if (!Array.isArray(spamTriggerHistory)) {
+                spamTriggerHistory = [];
+            }
+        } catch (e) {
+            spamTriggerHistory = [];
+        }
+    } else {
+        spamTriggerHistory = [];
+    }
+
+    const oneHourAgo = Date.now() - 3600000;
+    spamTriggerHistory = spamTriggerHistory.filter(ts => ts > oneHourAgo);
+    saveSpamTriggerHistory();
+}
+
+function recordSpamTrigger() {
+    const now = Date.now();
+
+    if (now - lastSpamRecordTime < 5000) {
+        return;
+    }
+
+    lastSpamRecordTime = now;
+    spamTriggerHistory.push(now);
+
+    const oneHourAgo = now - 3600000;
+    spamTriggerHistory = spamTriggerHistory.filter(ts => ts > oneHourAgo);
+    saveSpamTriggerHistory();
+}
+
+function getSpamTriggerCount() {
+    const oneHourAgo = Date.now() - 3600000;
+    spamTriggerHistory = spamTriggerHistory.filter(ts => ts > oneHourAgo);
+    return spamTriggerHistory.length;
+}
+
+function scheduleNextExpiry() {
+    if (nextExpiryTimeout) {
+        clearTimeout(nextExpiryTimeout);
+        nextExpiryTimeout = null;
+    }
+
+    const now = Date.now();
+    const oneHourAgo = now - 3600000;
+    sentHistoryTimestamps = sentHistoryTimestamps.filter(ts => ts > oneHourAgo);
+    saveSentHistory();
+
+    if (sentHistoryTimestamps.length > 0) {
+        const oldestTimestamp = sentHistoryTimestamps[0];
+        const timeUntilExpiry = oldestTimestamp + 3600000 - now;
+
+        if (timeUntilExpiry > 0) {
+            nextExpiryTimeout = setTimeout(function() {
+                scheduleNextExpiry();
+                if (!isShowingZeroWarning) {
+                    check();
+                }
+            }, timeUntilExpiry + 100);
+        } else {
+            scheduleNextExpiry();
+        }
+    }
+}
+
+function recordSentBadge() {
+    const now = Date.now();
+    sentHistoryTimestamps.push(now);
+    saveSentHistory();
+    scheduleNextExpiry();
+}
+
+function loadSentHistory() {
+    const containerKey = getContainerKey();
+    const key = `hb_oclb_sentHistory_${containerKey}`;
+    const saved = GM_getValue(key, null);
+
+    if (saved) {
+        try {
+            sentHistoryTimestamps = JSON.parse(saved);
+            if (!Array.isArray(sentHistoryTimestamps)) {
+                sentHistoryTimestamps = [];
+            }
+        } catch (e) {
+            sentHistoryTimestamps = [];
+        }
+    } else {
+        sentHistoryTimestamps = [];
+    }
+
+    scheduleNextExpiry();
+}
+
+function getSentCount() {
+    const now = Date.now();
+    const oneHourAgo = now - 3600000;
+    sentHistoryTimestamps = sentHistoryTimestamps.filter(ts => ts > oneHourAgo);
+    return sentHistoryTimestamps.length;
+}
+
+function adjustSpamCooldown() {
+    const sentCount = getSentCount();
+    const externalTriggers = getSpamTriggerCount();
+
+    let baseMinutes;
+    if (sentCount >= 80) {
+        baseMinutes = 15;
+    } else if (sentCount >= 70) {
+        baseMinutes = 13;
+    } else if (sentCount >= 60) {
+        baseMinutes = 10;
+    } else if (sentCount >= 40) {
+        baseMinutes = 8;
+    } else if (sentCount >= 20) {
+        baseMinutes = 5;
+    } else {
+        baseMinutes = 3;
+    }
+
+    let extraMinutes = 0;
+    if (externalTriggers >= 10) {
+        extraMinutes = 30;
+    } else if (externalTriggers >= 5) {
+        extraMinutes = 15;
+    } else if (externalTriggers >= 3) {
+        extraMinutes = 8;
+    } else if (externalTriggers >= 1) {
+        extraMinutes = 3;
+    }
+
+    const totalMinutes = baseMinutes + extraMinutes;
+    const variation = Math.floor(Math.random() * 6);
+    const finalMinutes = totalMinutes + variation;
+
+    return finalMinutes;
+}
+
 /* ==========================================================================
    Section 3: Messages Page Position
    ========================================================================== */
@@ -415,8 +571,10 @@ function updatePanelPosition() {
     if (!panel) return;
 
     const isMessagesPage = window.location.pathname.includes("/messages");
-    clearTimeout(window.hbPositionTimeout);
-    window.hbPositionTimeout = setTimeout(() => {
+    if (window.hbPositionTimeout) {
+        clearTimeout(window.hbPositionTimeout);
+    }
+    window.hbPositionTimeout = setTimeout(function() {
         if (isMessagesPage) {
             panel.classList.add("hb-messages-page");
         } else {
@@ -436,7 +594,7 @@ function create() {
 
     panel = make("div", "hb-oclb-icon");
 
-    panel.onclick = (ev) => {
+    panel.onclick = function(ev) {
         ev.stopPropagation();
 
         if (getElementsLength(getGiveSelector()) === 0 && !isShowingZeroWarning) {
@@ -478,7 +636,7 @@ function showZeroBadgeWarning() {
 
     const html = `
         <div id="hb-oclb-title-container">
-            <span class="hb-oclb-title-text">${titleText}</span>
+            <span class="hb-oclb-title-text">${escapeHtml(titleText)}</span>
         </div>
         <hr class="hb-oclb-divider">
         <div class="hb-oclb-line hb-oclb-error hb-oclb-warn">
@@ -487,7 +645,7 @@ function showZeroBadgeWarning() {
         </div>
         <hr class="hb-oclb-divider">
         <div class="hb-warning-message">
-            Have you Installed <a href="${installUrl}" target="_blank">${installText}</a>?
+            Have you Installed <a href="${escapeHtml(installUrl)}" target="_blank">${escapeHtml(installText)}</a>?
         </div>`;
 
     label.innerHTML = html;
@@ -511,17 +669,17 @@ function updateIconForMode() {
    ========================================================================== */
 
 function setupObserver() {
-    observer = new MutationObserver((mutations) => {
+    observer = new MutationObserver(function(mutations) {
         let needsRecreate = false;
 
-        mutations.forEach((mutation) => {
+        mutations.forEach(function(mutation) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
                 const body = document.body || document.documentElement;
                 const hasDarkClass = body.classList.contains('theme-dark');
                 const currentPanel = document.getElementById('hb-oclb-icon');
 
                 if (currentPanel) {
-                    const computed = getComputedStyle(currentPanel);
+                    const computed = window.getComputedStyle(currentPanel);
                     if ((hasDarkClass && computed.backgroundColor === 'rgb(245, 245, 245)') ||
                         (!hasDarkClass && computed.backgroundColor === 'rgb(30, 30, 30)')) {
                         needsRecreate = true;
@@ -539,27 +697,61 @@ function setupObserver() {
         }
     });
 
-    observer.observe(document.body || document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class', 'style']
-    });
+    const targetNode = document.body || document.documentElement;
+    if (targetNode) {
+        observer.observe(targetNode, {
+            attributes: true,
+            attributeFilter: ['class', 'style']
+        });
+    }
+}
+
+let spamObserverActive = false;
+let hasRecordedCurrentSpam = false;
+
+function setupSpamMonitor() {
+    if (spamObserverActive) return;
+    spamObserverActive = true;
+
+    setInterval(function() {
+        const spamSelector = getSpamSelector();
+        const spamCount = getElementsLength(spamSelector);
+
+        if (spamCount > 0 && !hasRecordedCurrentSpam) {
+            if (!active && !stopAuto) {
+                hasRecordedCurrentSpam = true;
+                recordSpamTrigger();
+
+                setTimeout(function() {
+                    if (getElementsLength(getSpamSelector()) === 0) {
+                        hasRecordedCurrentSpam = false;
+                    }
+                }, 1000);
+            }
+        } else if (spamCount === 0) {
+            hasRecordedCurrentSpam = false;
+        }
+    }, 2000);
 }
 
 function init() {
-    const waitForBody = setInterval(async () => {
+    const waitForBody = setInterval(function() {
         if (document.body) {
             clearInterval(waitForBody);
             loadSpamTimer();
-            setTimeout(() => {
+            loadSentHistory();
+            loadSpamTriggerHistory();
+            setTimeout(function() {
                 create();
                 check();
             }, 200);
             setupObserver();
+            setupSpamMonitor();
         }
     }, 50);
 }
 
-window.addEventListener("message", e => {
+window.addEventListener("message", function(e) {
     if (typeof e.data === "string" && e.data.includes("oclb")) check();
 });
 
@@ -569,7 +761,7 @@ if (document.readyState === "loading") {
     init();
 }
 
-setInterval(() => {
+setInterval(function() {
     if (!panel) create();
     else {
         updatePanelPosition();
@@ -614,8 +806,10 @@ function tryBulk() {
     }
 
     if (getElementsLength(getSpamSelector()) > 0) {
+        recordSpamTrigger();
+
         if (spamWaitUntil === 0) {
-            const minutes = 10 + Math.floor(Math.random() * 11);
+            const minutes = adjustSpamCooldown();
             spamWaitUntil = Date.now() + (minutes * 60 * 1000);
             saveSpamTimer();
         }
@@ -634,7 +828,7 @@ function tryBulk() {
     if (g) {
         bulk();
     } else {
-        setTimeout(() => {
+        setTimeout(function() {
             check();
             if (getFirstElement(getGiveSelector())) bulk();
         }, 800);
@@ -656,6 +850,7 @@ function bulk() {
     }
 
     if (getElementsLength(getSpamSelector()) > 0) {
+        recordSpamTrigger();
         tryBulk();
         return;
     }
@@ -669,6 +864,7 @@ function bulk() {
 
     active = 1;
     g.click();
+    recordSentBadge();
     check();
     currentInterval = setTimeout(bulk, 500);
 }
@@ -693,7 +889,7 @@ function check() {
         if (remainingMs > 0) {
             const minutes = Math.floor(remainingMs / 60000);
             const seconds = Math.floor((remainingMs % 60000) / 1000);
-            displayCount = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            displayCount = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
             isSpamCountdown = true;
         } else {
             spamWaitUntil = 0;
@@ -702,31 +898,31 @@ function check() {
         }
     }
 
+    count.classList.remove('hb-count-spam', 'hb-count-normal', 'hb-count-zero');
     if (isSpamCountdown) {
         count.classList.add('hb-count-spam');
-        count.classList.remove('hb-count-normal', 'hb-count-zero');
     } else if (g === 0) {
         count.classList.add('hb-count-zero');
-        count.classList.remove('hb-count-normal', 'hb-count-spam');
-        displayCount = "0";
     } else {
         count.classList.add('hb-count-normal');
-        count.classList.remove('hb-count-spam', 'hb-count-zero');
     }
 
-    if (count.innerHTML !== displayCount) {
-        count.innerHTML = displayCount;
+    const displayCountStr = String(displayCount);
+    if (count.innerHTML !== displayCountStr) {
+        count.innerHTML = displayCountStr;
     }
 
     const titleText = cakeMode ? "OCCB Helper" : "OCLB Helper";
     const lineLabel = cakeMode ? "+Cake" : "+Llama";
+    const sentPastHour = getSentCount();
+    const externalTriggers = getSpamTriggerCount();
 
     const modeIconSrc = cakeMode ? LLAMA_ICON : CAKE_ICON;
-    const modeIconHtml = `<img src="${modeIconSrc}" class="hb-oclb-mode-icon" id="hb-oclb-mode-icon" alt="Switch mode">`;
+    const modeIconHtml = '<img src="' + modeIconSrc + '" class="hb-oclb-mode-icon" id="hb-oclb-mode-icon" alt="Switch mode">';
 
     let html = `
         <div id="hb-oclb-title-container">
-            <span class="hb-oclb-title-text">${titleText}</span>
+            <span class="hb-oclb-title-text">${escapeHtml(titleText)}</span>
             <span>${modeIconHtml}</span>
         </div>`;
 
@@ -735,7 +931,10 @@ function check() {
     if (!hasButtons) {
         html += `
         <hr class="hb-oclb-divider">
-        ${divLine(lineLabel, "0", "hb-oclb-accent")}`;
+        ${divLine(lineLabel, "0", "hb-oclb-accent")}
+        ${divLine("Sent last 60m", sentPastHour, "hb-oclb-accent")}
+        ${divLine("Spam last 60m", externalTriggers, externalTriggers > 0 ? "hb-oclb-error" : "hb-oclb-accent")}
+        <hr class="hb-oclb-divider">`;
     } else {
         html += `
         <hr class="hb-oclb-divider">
@@ -745,39 +944,40 @@ function check() {
         if (s > 0) html += divLine("Spam", s, "hb-oclb-error hb-oclb-warn");
         if (e > 0) html += divLine("Error", e, "hb-oclb-warn");
 
-        html += `<hr class="hb-oclb-divider">`;
+        html += `${divLine("Sent last 60m", sentPastHour, "hb-oclb-accent")}
+        ${divLine("Spam last 60m", externalTriggers, externalTriggers > 0 ? "hb-oclb-error" : "hb-oclb-accent")}
+        <hr class="hb-oclb-divider">`;
     }
 
     label.innerHTML = html;
 
-    const modeIcon = document.getElementById("hb-oclb-mode-icon");
-    if (modeIcon) {
-        modeIcon.onclick = (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
+    setTimeout(function() {
+        const modeIcon = document.getElementById("hb-oclb-mode-icon");
+        if (modeIcon) {
+            modeIcon.onclick = function(ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
 
-            stopCurrentMode();
+                stopCurrentMode();
 
-            cakeMode = cakeMode ? 0 : 1;
-            GM_setValue("hb_oclb_cakeMode", cakeMode);
-            updateIconForMode();
+                cakeMode = cakeMode ? 0 : 1;
+                GM_setValue("hb_oclb_cakeMode", cakeMode);
+                updateIconForMode();
 
-            setTimeout(() => {
-                active = 0;
-                stopAuto = 0;
-                check();
-            }, 200);
-        };
-    }
+                setTimeout(function() {
+                    active = 0;
+                    stopAuto = 0;
+                    check();
+                }, 200);
+            };
+        }
+    }, 0);
 
+    panel.classList.remove("hb-oclb-active", "hb-oclb-stopped");
     if (stopAuto) {
         panel.classList.add("hb-oclb-stopped");
-        panel.classList.remove("hb-oclb-active");
     } else if (active) {
         panel.classList.add("hb-oclb-active");
-        panel.classList.remove("hb-oclb-stopped");
-    } else {
-        panel.classList.remove("hb-oclb-active", "hb-oclb-stopped");
     }
 
     if (!active && !stopAuto && window.location.search.includes("hb_oclbh")) {
@@ -793,7 +993,7 @@ function grow() {
     if (!panel || isShowingZeroWarning) return;
     panel.style.setProperty('transition', 'none', 'important');
     panel.classList.add('hb-hovering');
-    setTimeout(() => {
+    setTimeout(function() {
         panel.style.removeProperty('transition');
     }, 50);
 }
@@ -802,13 +1002,13 @@ function shrink() {
     if (!panel || isShowingZeroWarning) return;
     panel.style.setProperty('transition', 'none', 'important');
     panel.classList.remove('hb-hovering');
-    setTimeout(() => {
+    setTimeout(function() {
         panel.style.removeProperty('transition');
     }, 50);
 }
 
 document.addEventListener('click', function(ev) {
-    if (isShowingZeroWarning && !panel.contains(ev.target)) {
+    if (isShowingZeroWarning && panel && !panel.contains(ev.target)) {
         hideZeroWarning();
     }
 }, true);
