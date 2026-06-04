@@ -3,7 +3,7 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button & Liamb135's One Click Cake Button
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.8.0
+// @version         1.8.1
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @run-at          document-end
@@ -499,14 +499,20 @@
         }
 
         let targetElement = null;
+        let targetType = null;
+
         const allMenus = document.querySelectorAll('[role="menu"]');
         for (const menu of allMenus) {
             const rect = menu.getBoundingClientRect();
             if (rect.height > 0 && rect.width > 0) {
                 const text = menu.innerText || '';
                 if (text.includes('Reply') && text.includes('spam')) {
-                    targetElement = menu;
-                    break;
+                    const isInsideMessages = menu.closest('[data-testid="room-message-list"], [role="dialog"][aria-describedby="messaging-area-heading"]');
+                    if (isInsideMessages) {
+                        targetElement = menu;
+                        targetType = 'reply-menu';
+                        break;
+                    }
                 }
             }
         }
@@ -514,25 +520,33 @@
         if (!targetElement) {
             const textbox = document.querySelector('[contenteditable="true"][role="textbox"]');
             if (textbox && textbox.offsetParent !== null) {
-                let container = textbox.parentElement;
-                while (container && container !== document.body) {
-                    const sendBtn = Array.from(container.querySelectorAll('button')).find(btn => btn.textContent.trim() === 'Send');
-                    if (sendBtn && sendBtn.offsetParent !== null) {
-                        targetElement = container;
-                        break;
-                    }
-                    container = container.parentElement;
-                }
-                if (!targetElement) {
-                    let parent = textbox.parentElement;
-                    while (parent && parent !== document.body) {
-                        if (parent.scrollHeight > parent.clientHeight) {
-                            targetElement = parent;
+                const isInsideMessages = textbox.closest('[data-testid="room-message-list"], [role="dialog"][aria-describedby="messaging-area-heading"]');
+                if (isInsideMessages) {
+                    let container = textbox.parentElement;
+                    while (container && container !== document.body) {
+                        const sendBtn = Array.from(container.querySelectorAll('button')).find(btn => btn.textContent.trim() === 'Send');
+                        if (sendBtn && sendBtn.offsetParent !== null) {
+                            targetElement = container;
+                            targetType = 'compose-container';
                             break;
                         }
-                        parent = parent.parentElement;
+                        container = container.parentElement;
                     }
-                    if (!targetElement) targetElement = textbox.closest('.vMuz7q') || textbox;
+                    if (!targetElement) {
+                        let parent = textbox.parentElement;
+                        while (parent && parent !== document.body) {
+                            if (parent.scrollHeight > parent.clientHeight) {
+                                targetElement = parent;
+                                targetType = 'scrollable-parent';
+                                break;
+                            }
+                            parent = parent.parentElement;
+                        }
+                        if (!targetElement) {
+                            targetElement = textbox.closest('.vMuz7q') || textbox;
+                            targetType = 'fallback-textbox';
+                        }
+                    }
                 }
             }
         }
