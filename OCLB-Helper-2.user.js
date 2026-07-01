@@ -3,7 +3,7 @@
 // @namespace       http://hampshirebrony.neocities.org
 // @description     Augments Kishan Bagaria's One Click Llama Button & Liamb135's One Click Cake Button
 // @author          Liamb135 | Original Author: HampshireBrony
-// @version         1.8.1
+// @version         1.8.2
 // @icon            https://kishan.org/-/oclb.png
 // @match           *://*.deviantart.com/*
 // @run-at          document-end
@@ -297,6 +297,8 @@
     let nextExpiryTimeout = null;
     let currentUsername = null;
     let dataLoaded = false;
+
+    let isTabVisible = true;
 
     window._hbShiftHeld = false;
 
@@ -792,6 +794,10 @@
         if (ev.key === 'Shift') window._hbShiftHeld = false;
     });
 
+    document.addEventListener('visibilitychange', () => {
+        isTabVisible = !document.hidden;
+    });
+
     const stopCurrentMode = () => {
         active = 0;
         stopAuto = 1;
@@ -861,6 +867,8 @@
     };
 
     const tryLoadMore = () => {
+        if (!isTabVisible) return false;
+
         const loadMoreButtons = document.querySelectorAll('button');
         for (const btn of loadMoreButtons) {
             const text = btn.textContent.trim().toLowerCase();
@@ -885,6 +893,12 @@
         const hasRequiredScript = checkRequiredScript();
 
         if (!hasRequiredScript) {
+            if (!isTabVisible) {
+                if (currentInterval) clearTimeout(currentInterval);
+                currentInterval = setTimeout(bulk, 5000);
+                return;
+            }
+
             if (tryLoadMore()) {
                 currentInterval = setTimeout(bulk, 3000);
             } else {
@@ -913,6 +927,12 @@
 
         const g = getFirstElement(getGiveSelector());
         if (!g) {
+            if (!isTabVisible) {
+                if (currentInterval) clearTimeout(currentInterval);
+                currentInterval = setTimeout(bulk, 3000);
+                return;
+            }
+
             if (getElementsLength(getSuccessSelector()) > 0 || getElementsLength(getGivingSelector()) > 0) {
                 currentInterval = setTimeout(bulk, 300);
                 return;
@@ -937,8 +957,9 @@
         update();
 
         const remainingGive = document.querySelectorAll(getGiveSelector());
-        const delay = remainingGive.length <= 1 ? (fastMode ? 500 : 800) : (fastMode ? 200 : 500);
-        currentInterval = setTimeout(bulk, delay);
+        let baseDelay = remainingGive.length <= 1 ? (fastMode ? 500 : 800) : (fastMode ? 200 : 500);
+        const jitteredDelay = Math.round(baseDelay * (0.8 + Math.random() * 0.4));
+        currentInterval = setTimeout(bulk, jitteredDelay);
     };
 
     const update = () => {
